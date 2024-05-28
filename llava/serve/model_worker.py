@@ -154,6 +154,9 @@ class ModelWorker:
         else:
             images = None
             image_args = {}
+        matryoshka_vis_token_scale = params.get("matryoshka_vis_token_scale", None)
+        if matryoshka_vis_token_scale is not None:
+            image_args["matryoshka_vis_token_scale"] = matryoshka_vis_token_scale
 
         temperature = float(params.get("temperature", 1.0))
         top_p = float(params.get("top_p", 1.0))

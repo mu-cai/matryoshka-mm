@@ -111,6 +111,7 @@ class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
     ) -> Union[GenerateOutput, torch.LongTensor]:
         position_ids = kwargs.pop("position_ids", None)
         attention_mask = kwargs.pop("attention_mask", None)
+        matryoshka_vis_token_scale = kwargs.pop("matryoshka_vis_token_scale", None)
         if "inputs_embeds" in kwargs:
             raise NotImplementedError("`inputs_embeds` is not supported")
 
@@ -129,7 +130,8 @@ class LlavaLlamaForCausalLM(LlamaForCausalLM, LlavaMetaForCausalLM):
                 None,
                 None,
                 images,
-                image_sizes=image_sizes
+                image_sizes=image_sizes,
+                matryoshka_vis_token_scale = matryoshka_vis_token_scale
             )
         else:
             inputs_embeds = self.get_model().embed_tokens(inputs)

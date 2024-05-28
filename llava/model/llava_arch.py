@@ -24,7 +24,8 @@ from .multimodal_projector.builder import build_vision_projector
 from llava.constants import IGNORE_INDEX, IMAGE_TOKEN_INDEX, DEFAULT_IMAGE_PATCH_TOKEN, DEFAULT_IM_START_TOKEN, DEFAULT_IM_END_TOKEN
 
 from llava.mm_utils import get_anyres_image_grid_shape
-
+import torch.nn.functional as F
+import numpy as np
 
 class LlavaMetaModel:
 
@@ -128,6 +129,7 @@ def unpad_image(tensor, original_size):
     return unpadded_tensor
 
 
+
 class LlavaMetaForCausalLM(ABC):
 
     @abstractmethod
@@ -141,10 +143,22 @@ class LlavaMetaForCausalLM(ABC):
         image_features = self.get_model().get_vision_tower()(images)
         image_features = self.get_model().mm_projector(image_features)
         return image_features
-
+    
+    def matryoshka_vis_token_process(self, image_features, matryoshka_vis_token_scale):
+        N, H_W, C = image_features.shape
+        H = W = int(H_W ** 0.5)
+        reshaped_tensor = image_features.view(N, H, W, C)
+        reshaped_tensor = reshaped_tensor.permute(0, 3, 1, 2)
+        pool_size = stride = int( np.sqrt(H_W / matryoshka_vis_token_scale) )
+        pooled_tensor = F.avg_pool2d(reshaped_tensor, kernel_size=pool_size, stride=stride)
+        image_features = pooled_tensor.permute(0, 2, 3, 1)
+        image_features = image_features.reshape(N, -1, C)
+        print('image_features.shape :', image_features.shape)
+        return image_features
+        
     def prepare_inputs_labels_for_multimodal(
         self, input_ids, position_ids, attention_mask, past_key_values, labels,
-        images, image_sizes=None
+        images, image_sizes=None, matryoshka_vis_token_scale = None,
     ):
         vision_tower = self.get_vision_tower()
         if vision_tower is None or images is None or input_ids.shape[1] == 1:
@@ -156,6 +170,8 @@ class LlavaMetaForCausalLM(ABC):
             concat_images = torch.cat([image for image in images], dim=0)
             image_features = self.encode_images(concat_images)
             split_sizes = [image.shape[0] for image in images]
+            if matryoshka_vis_token_scale != None:
+                image_features = self.matryoshka_vis_token_process(image_features, matryoshka_vis_token_scale)
             image_features = torch.split(image_features, split_sizes, dim=0)
             mm_patch_merge_type = getattr(self.config, 'mm_patch_merge_type', 'flat')
             image_aspect_ratio = getattr(self.config, 'image_aspect_ratio', 'square')
@@ -167,7 +183,8 @@ class LlavaMetaForCausalLM(ABC):
                     if image_feature.shape[0] > 1:
                         base_image_feature = image_feature[0]
                         image_feature = image_feature[1:]
-                        height = width = self.get_vision_tower().num_patches_per_side
+                        # height = width = self.get_vision_tower().num_patches_per_side 
+                        height = width = int(np.sqrt(base_image_feature.shape[0]))
                         assert height * width == base_image_feature.shape[0]
                         if image_aspect_ratio == 'anyres':
                             num_patch_width, num_patch_height = get_anyres_image_grid_shape(image_sizes[image_idx], self.config.image_grid_pinpoints, self.get_vision_tower().config.image_size)
@@ -200,7 +217,10 @@ class LlavaMetaForCausalLM(ABC):
                 raise ValueError(f"Unexpected mm_patch_merge_type: {self.config.mm_patch_merge_type}")
         else:
             image_features = self.encode_images(images)
-
+            if matryoshka_vis_token_scale != None:
+                image_features = self.matryoshka_vis_token_process(image_features, matryoshka_vis_token_scale)
+                
+                
         # TODO: image start / end is not implemented here to support pretraining.
         if getattr(self.config, 'tune_mm_mlp_adapter', False) and getattr(self.config, 'mm_use_im_start_end', False):
             raise NotImplementedError
