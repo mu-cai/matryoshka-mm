@@ -283,7 +283,7 @@ For LLaVA-NeXT, see [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval).
 If you find LLaVA useful for your research and applications, please cite using this BibTeX:
 ```bibtex
 @misc{cai2024matryoshka,
-    author      = {Cai, Mu and Yang, Jianwei and Gao,  Jianfeng and Lee, Yong Jae},
+    author      = {Cai, Mu and Yang, Jianwei and Gao, Jianfeng and Lee, Yong Jae},
     title       = {Matryoshka Multimodal Models},
     publisher   = {arXiv:2405.17430},
     year        = {2024}

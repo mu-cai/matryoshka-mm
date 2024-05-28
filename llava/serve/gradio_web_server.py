@@ -368,7 +368,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     
 
                 with gr.Accordion("Matryoshka Visual Token Scale", open=True) as parameter_row:
-                    matryoshka_vis_token_scale = gr.Slider(minimum=1, maximum=5, step=1, interactive=True)
+                    matryoshka_vis_token_scale = gr.Slider(minimum=1, maximum=5, step=1, value=5, interactive=True)
                 
                     # gr.Slider(
                     #         choices=[576, 144, 36, 9, 1],
