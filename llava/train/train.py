@@ -35,12 +35,22 @@ from llava import conversation as conversation_lib
 from llava.model import *
 from llava.mm_utils import tokenizer_image_token
 
+
 from PIL import Image
 
 
 local_rank = None
 
 
+def list_of_integers(string, ratio = 1):  
+    if string  != None:
+        if ',' not in string:
+            return [int(string)* ratio ]
+        return [int(item)* ratio for item  in string.split(',')]  
+    else:
+        return string
+    
+    
 def rank0_print(*args):
     if local_rank == 0:
         print(*args)
@@ -64,6 +74,9 @@ class ModelArguments:
     mm_use_im_patch_token: bool = field(default=True)
     mm_patch_merge_type: Optional[str] = field(default='flat')
     mm_vision_select_feature: Optional[str] = field(default="patch")
+    matryoshka_vis_token_scale: Optional[str] = field(default=None)
+    unfreeze_mm_vision_tower: bool = field(default=False)
+    
 
 
 @dataclass
@@ -110,6 +123,8 @@ class TrainingArguments(transformers.TrainingArguments):
     lora_bias: str = "none"
     mm_projector_lr: Optional[float] = None
     group_by_modality_length: bool = field(default=False)
+    mm_vision_tower_lr: Optional[float] = None
+    
 
 
 def maybe_zero_3(param, ignore_status=False, name=None):
@@ -839,6 +854,9 @@ def train(attn_implementation=None):
             torch_dtype=(torch.bfloat16 if training_args.bf16 else None),
             **bnb_model_from_pretrained_args
         )
+        
+    matryoshka_vis_token_scale = getattr(model_args, 'matryoshka_vis_token_scale', None)
+    model.model.config.matryoshka_vis_token_scale = list_of_integers(matryoshka_vis_token_scale)
     model.config.use_cache = False
 
     if model_args.freeze_backbone:
@@ -933,12 +951,17 @@ def train(attn_implementation=None):
         if training_args.freeze_mm_mlp_adapter:
             for p in model.get_model().mm_projector.parameters():
                 p.requires_grad = False
-
+                
+        model.config.unfreeze_mm_vision_tower = model_args.unfreeze_mm_vision_tower or getattr(model.config, 'unfreeze_mm_vision_tower', False)
+        if model_args.unfreeze_mm_vision_tower:
+            vision_tower.requires_grad_(True)
+            
         if training_args.bits in [4, 8]:
             model.get_model().mm_projector.to(dtype=compute_dtype, device=training_args.device)
 
         model.config.mm_use_im_start_end = data_args.mm_use_im_start_end = model_args.mm_use_im_start_end
         model.config.mm_projector_lr = training_args.mm_projector_lr
+        model.config.mm_vision_tower_lr = training_args.mm_vision_tower_lr
         training_args.use_im_start_end = model_args.mm_use_im_start_end
         model.config.mm_use_im_patch_token = model_args.mm_use_im_patch_token
         model.initialize_vision_tokenizer(model_args, tokenizer=tokenizer)
@@ -962,7 +985,11 @@ def train(attn_implementation=None):
                     tokenizer=tokenizer,
                     args=training_args,
                     **data_module)
-
+    
+    for names, p in model.named_parameters():
+        if p.requires_grad:
+            rank0_print(names, "requires_grad")
+            
     if list(pathlib.Path(training_args.output_dir).glob("checkpoint-*")):
         trainer.train(resume_from_checkpoint=True)
     else:

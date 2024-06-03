@@ -110,7 +110,6 @@ def eval_model(args):
         .unsqueeze(0)
         .cuda()
     )
-
     with torch.inference_mode():
         output_ids = model.generate(
             input_ids,
@@ -122,6 +121,7 @@ def eval_model(args):
             num_beams=args.num_beams,
             max_new_tokens=args.max_new_tokens,
             use_cache=True,
+            matryoshka_vis_token_scale = getattr(args, "matryoshka_vis_token_scale", None)
         )
 
     outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
@@ -140,6 +140,8 @@ if __name__ == "__main__":
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
     parser.add_argument("--max_new_tokens", type=int, default=512)
+    parser.add_argument("--matryoshka_vis_token_scale", type=int, default=None)
+    
     args = parser.parse_args()
 
     eval_model(args)

@@ -101,7 +101,9 @@ def main(args):
                 temperature=args.temperature,
                 max_new_tokens=args.max_new_tokens,
                 streamer=streamer,
-                use_cache=True)
+                use_cache=True,
+                matryoshka_vis_token_scale = getattr(args, "matryoshka_vis_token_scale", None)
+                )
 
         outputs = tokenizer.decode(output_ids[0]).strip()
         conv.messages[-1][-1] = outputs
@@ -122,5 +124,6 @@ if __name__ == "__main__":
     parser.add_argument("--load-8bit", action="store_true")
     parser.add_argument("--load-4bit", action="store_true")
     parser.add_argument("--debug", action="store_true")
+    parser.add_argument("--matryoshka_vis_token_scale", type=int, default=None)
     args = parser.parse_args()
     main(args)

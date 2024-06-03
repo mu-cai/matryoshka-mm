@@ -34,4 +34,6 @@ ckpts*
 # Demo
 serve_images/
 llava/eval/table/results/test_sqa_llava_lcs_558k_sqa_12e_vicuna_v1_3_13b.json
+IG-VLM/.git_org
+lmms-eval/.git_org
 llava/eval/table/results/test_sqa_llava_13b_v0.json

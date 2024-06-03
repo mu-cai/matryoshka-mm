@@ -155,6 +155,8 @@ class Conversation:
             if i % 2 == 0:
                 if type(msg) is tuple:
                     msg, image, image_process_mode = msg
+                    if type(image) is list:
+                        image = image[0]
                     image = self.process_image(image, image_process_mode, return_pil=return_pil)
                     images.append(image)
         return images
@@ -165,11 +167,16 @@ class Conversation:
             if i % 2 == 0:
                 if type(msg) is tuple:
                     msg, image, image_process_mode = msg
+                    if type(image) is list:
+                        image, video = image
+                        append_img_str = f'<video controls playsinline width="500" style="display: inline-block;"  src="{video}"></video>\n'
+                    else:
+                        append_img_str = ''
                     img_b64_str = self.process_image(
                         image, "Default", return_pil=False,
                         image_format='JPEG')
                     img_str = f'<img src="data:image/jpeg;base64,{img_b64_str}" alt="user upload image" />'
-                    msg = img_str + msg.replace('<image>', '').strip()
+                    msg = img_str +append_img_str + msg.replace('<image>', '').strip()
                     ret.append([msg, None])
                 else:
                     ret.append([msg, None])

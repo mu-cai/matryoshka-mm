@@ -16,5 +16,5 @@ These are basically all the changes you need to make to replace the LLM.
 
 ## Visual Encoder
 
-You can check out [`clip_encoder.py`](https://github.com/haotian-liu/LLaVA/blob/main/llava/model/multimodal_encoder/clip_encoder.py) on how we implement the CLIP visual encoder.
+You can check out [`clip_encoder.py`](https://github.com/mu-cai/matryoshka-mm/blob/main/llava/model/multimodal_encoder/clip_encoder.py) on how we implement the CLIP visual encoder.
 

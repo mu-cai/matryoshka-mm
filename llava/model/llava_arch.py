@@ -153,7 +153,7 @@ class LlavaMetaForCausalLM(ABC):
         pooled_tensor = F.avg_pool2d(reshaped_tensor, kernel_size=pool_size, stride=stride)
         image_features = pooled_tensor.permute(0, 2, 3, 1)
         image_features = image_features.reshape(N, -1, C)
-        print('image_features.shape :', image_features.shape)
+        # print('image_features.shape :', image_features.shape)
         return image_features
         
     def prepare_inputs_labels_for_multimodal(

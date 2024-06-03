@@ -17,7 +17,7 @@
 
 
 ## Release
-
+- [6/3] 🔥 All training (`llava-1.5-m3`) and evaluations (`llava-1.5-m3` and `llava-next-m3`)  code are release. 
 - [5/27] 🔥 We released **Matryoshka Multimodal Models**. We propose to learn visual tokens in a nested manner following a coarse-to-fine order.  Checkout the [paper](https://arxiv.org/abs/xx) and [demo](https://pages.cs.wisc.edu/~mucai/matryoshka-mm.html).
 
 
@@ -104,7 +104,8 @@ args = type('Args', (), {
     "temperature": 0,
     "top_p": None,
     "num_beams": 1,
-    "max_new_tokens": 512
+    "max_new_tokens": 512,
+    "matryoshka_vis_token_scale": 576,
 })()
 
 eval_model(args)
@@ -206,6 +207,7 @@ Chat about images using LLaVA without the need of Gradio interface. It also supp
 python -m llava.serve.cli \
     --model-path mucai/llava-next-vicuna-7b-m3 \
     --image-file "https://llava-vl.github.io/static/images/view.jpg" \
+    --matryoshka_vis_token_scale 576 \
     --load-4bit
 ```
 
@@ -275,7 +277,11 @@ If you are interested in finetuning M3 model to your own task/data, please check
 We use the same benchmark as LLaVA-1.5 and LLaVA-Next
 
 For LLaVA-1.5, see [Evaluation.md](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/Evaluation.md).
-For LLaVA-NeXT, see [lmms-eval](https://github.com/EvolvingLMMs-Lab/lmms-eval).
+
+For LLaVA-NeXT on image understanding, see [lmms-eval](https://github.com/mu-cai/matryoshka-mm/blob/main/lmms-eval).
+
+For LLaVA-NeXT on video understanding, see [IG-VLM](https://github.com/mu-cai/matryoshka-mm/blob/main/IG-VLM).
+
 
 
 ## Citation

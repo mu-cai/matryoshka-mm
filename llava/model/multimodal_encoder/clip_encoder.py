@@ -17,6 +17,7 @@ class CLIPVisionTower(nn.Module):
         if not delay_load:
             self.load_model()
         elif getattr(args, 'unfreeze_mm_vision_tower', False):
+            print(f'Checkpoint contains `vision_tower` weights: `unfreeze_mm_vision_tower`: True.')
             self.load_model()
         else:
             self.cfg_only = CLIPVisionConfig.from_pretrained(self.vision_tower_name)

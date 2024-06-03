@@ -69,7 +69,8 @@ def eval_model(args):
                 num_beams=args.num_beams,
                 # no_repeat_ngram_size=3,
                 max_new_tokens=1024,
-                use_cache=True)
+                use_cache=True,
+                matryoshka_vis_token_scale = getattr(args, "matryoshka_vis_token_scale", None))
 
         outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
 
@@ -96,6 +97,7 @@ if __name__ == "__main__":
     parser.add_argument("--temperature", type=float, default=0.2)
     parser.add_argument("--top_p", type=float, default=None)
     parser.add_argument("--num_beams", type=int, default=1)
+    parser.add_argument("--max_new_tokens", type=int, default=128)
     args = parser.parse_args()
 
     eval_model(args)

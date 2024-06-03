@@ -13,6 +13,72 @@ from llava.constants import LOGDIR
 from llava.utils import (build_logger, server_error_msg,
     violates_moderation, moderation_msg)
 import hashlib
+from moviepy.editor import VideoFileClip
+import math, cv2
+import numpy as np
+from PIL import Image
+
+
+def process_video_as_image_grids(video_path):
+    frame_fixed_number = 6
+    video_capture = VideoFileClip(video_path)
+    fps = video_capture.fps
+
+    total_frames = int(video_capture.reader.nframes)
+    # video_length = total_frames / fps
+
+    frame_count = 0
+    output_frame_index = 0
+    list_frame_data = []
+
+
+
+    frames_per_interval = math.floor(total_frames / frame_fixed_number)
+
+    frames = video_capture.iter_frames()
+
+    for frame in frames:
+        if frame_count % frames_per_interval == 0:
+                start = output_frame_index * frames_per_interval
+                frame_index_selected = start
+
+        if frame_index_selected == frame_count:
+                list_frame_data.append(frame)
+                output_frame_index += 1
+
+        if len(list_frame_data) == frame_fixed_number:
+                break
+
+        if frame_count == total_frames:
+                break
+
+        frame_count += 1
+
+    images = list_frame_data
+
+
+    func_max_per_row = lambda x: round(math.sqrt(x))
+    max_images_per_row = func_max_per_row(len(images))
+
+    min_width = min(img.shape[1] for img in images)
+    min_height = min(img.shape[0] for img in images)
+    resized_images = [cv2.resize(img, (min_width, min_height)) for img in images]
+
+    while len(resized_images) % max_images_per_row != 0:
+        resized_images.append(
+                np.ones((min_height, min_width, 3), dtype=np.uint8) * 255
+        )
+
+    image_rows = [
+    resized_images[i : i + max_images_per_row]
+    for i in range(0, len(resized_images), max_images_per_row)
+    ]
+    concatenated_rows = [np.hstack(row) for row in image_rows]
+
+    grid_image = np.vstack(concatenated_rows)
+    grid_image = Image.fromarray(grid_image)
+
+    return grid_image
 
 
 logger = build_logger("gradio_web_server", "gradio_web_server.log")
@@ -133,8 +199,27 @@ def clear_history(request: gr.Request):
     return (state, state.to_gradio_chatbot(), "", None) + (disable_btn,) * 5
 
 
-def add_text(state, text, image, image_process_mode, request: gr.Request):
+def add_text(state, text, image, video, image_process_mode, request: gr.Request):
     logger.info(f"add_text. ip: {request.client.host}. len: {len(text)}")
+    has_image = image is not None
+    has_video = video is not None
+    # prefix_video = 'Given the video represented as a collage of six images. Answer: '
+    prefix_video = 'Based on the provided video in the form of a collage of six images, answer: '
+    if image:
+        video = None
+    if video and len(state.messages) == 0:
+        image = process_video_as_image_grids(video)
+        text = prefix_video + text
+        print(text)
+    elif video and len(state.messages) > 0:
+        image_org = state.messages[0][1][1]
+        image_now = process_video_as_image_grids(video)
+        if image_now != image_org:
+            state = default_conversation.copy()
+            image = image_now
+            text = prefix_video + text
+            print(text)
+        # type(image) == PIL.Image.Image
     if len(text) <= 0 and image is None:
         state.skip_next = True
         return (state, state.to_gradio_chatbot(), "", None) + (no_change_btn,) * 5
@@ -156,7 +241,7 @@ def add_text(state, text, image, image_process_mode, request: gr.Request):
     state.append_message(state.roles[0], text)
     state.append_message(state.roles[1], None)
     state.skip_next = False
-    return (state, state.to_gradio_chatbot(), "", None) + (disable_btn,) * 5
+    return (state, state.to_gradio_chatbot(), "", None, video) + (disable_btn,) * 5
 
 
 def http_bot(state, model_selector, temperature, top_p, max_new_tokens, matryoshka_vis_token_scale, request: gr.Request):
@@ -296,7 +381,7 @@ def http_bot(state, model_selector, temperature, top_p, max_new_tokens, matryosh
 
 title_markdown = ("""
 # 🪆 M3: Matryoshka Multimodal Models
-[[Project Page](https://matryoshka-mm.github.io/)] [[Code](https://github.com/mu-cai/matryoshka-mm)] [[Model](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/MODEL_ZOO.md)] | 📚 [Paper](https://arxiv.org/abs/xxx)]
+[[Project Page](https://matryoshka-mm.github.io/)] [[Code](https://github.com/mu-cai/matryoshka-mm)] [[Model](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/MODEL_ZOO.md)] | 📚 [Paper](https://arxiv.org/abs/2405.17430)]
 """)
 
 tos_markdown = ("""
@@ -341,8 +426,12 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                         interactive=True,
                         show_label=False,
                         container=False)
-
+                height = 280
+                # imagebox = gr.Image(type="pil", height = height)
+                # videobox = gr.Video(label="Video", height = height)
                 imagebox = gr.Image(type="pil")
+                videobox = gr.Video(label="Video")
+                
                 image_process_mode = gr.Radio(
                     ["Crop", "Resize", "Pad", "Default"],
                     value="Default",
@@ -350,11 +439,36 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
 
                 if cur_dir is None:
                     cur_dir = os.path.dirname(os.path.abspath(__file__))
+                with gr.Accordion("Matryoshka Visual Token Scale", open=True) as parameter_row:
+                    matryoshka_vis_token_scale = gr.Slider(minimum=1, maximum=5, step=1, value=5, interactive=True,  label="Slider (1: coarsest; 5: finest)")
                 gr.Examples(examples=[
                     [f"{cur_dir}/examples/m3-demo-1.jpg", "Describe this image for me."],
                     # [f"{cur_dir}/examples/extreme_ironing.jpg", "What is unusual about this image?"],
                     [f"{cur_dir}/examples/waterview.jpg", "What are the things I should be cautious about when I visit here?"],
                 ], inputs=[imagebox, textbox])
+                
+                gr.Examples(
+                    examples=[
+                        [
+                            f"{cur_dir}/examples/sample_demo_1.mp4",
+                            "Why is this video funny?",
+                        ],
+                        [
+                            f"{cur_dir}/examples/sample_demo_3.mp4",
+                            "Can you identify any safety hazards in this video?"
+                        ],
+                        # [
+                        #     f"{cur_dir}/examples/sample_demo_9.mp4",
+                        #     "Describe the video.",
+                        # ],
+                        # [
+                        #     f"{cur_dir}/examples/sample_demo_22.mp4",
+                        #     "Describe the activity in the video.",
+                        # ],
+                    ],
+                    inputs=[videobox, textbox],
+                )
+                        
                 # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
                 #     matryoshka_vis_token_scale =  gr.Dropdown(choices=[1, 9, 36, 144, 576], value = 9, label="Select a Value")
                 # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
@@ -367,8 +481,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     # matryoshka_vis_token_scale = 
                     
 
-                with gr.Accordion("Matryoshka Visual Token Scale", open=True) as parameter_row:
-                    matryoshka_vis_token_scale = gr.Slider(minimum=1, maximum=5, step=1, value=5, interactive=True)
+
                 
                     # gr.Slider(
                     #         choices=[576, 144, 36, 9, 1],
@@ -385,7 +498,7 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                 chatbot = gr.Chatbot(
                     elem_id="chatbot",
                     label="LLaVA-M3 Chatbot",
-                    height=650,
+                    height=750,
                     layout="panel",
                 )
                 with gr.Row():
@@ -400,10 +513,13 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     #stop_btn = gr.Button(value="⏹️  Stop Generation", interactive=False)
                     regenerate_btn = gr.Button(value="🔄  Regenerate", interactive=False)
                     clear_btn = gr.Button(value="🗑️  Clear", interactive=False)
+                
+                gr.Markdown(tos_markdown)
+                gr.Markdown(learn_more_markdown)
 
-        if not embed_mode:
-            gr.Markdown(tos_markdown)
-            gr.Markdown(learn_more_markdown)
+        # if not embed_mode:
+        #     gr.Markdown(tos_markdown)
+        #     gr.Markdown(learn_more_markdown)
         url_params = gr.JSON(visible=False)
 
         # Register listeners
@@ -438,14 +554,14 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
         clear_btn.click(
             clear_history,
             None,
-            [state, chatbot, textbox, imagebox] + btn_list,
+            [state, chatbot, textbox, imagebox, videobox] + btn_list,
             queue=False
         )
 
         textbox.submit(
             add_text,
-            [state, textbox, imagebox, image_process_mode],
-            [state, chatbot, textbox, imagebox] + btn_list,
+            [state, textbox, imagebox, videobox,  image_process_mode],
+            [state, chatbot, textbox, imagebox, videobox] + btn_list,
             queue=False
         ).then(
             http_bot,
@@ -456,8 +572,8 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
 
         submit_btn.click(
             add_text,
-            [state, textbox, imagebox, image_process_mode],
-            [state, chatbot, textbox, imagebox] + btn_list
+            [state, textbox, imagebox, videobox, image_process_mode],
+            [state, chatbot, textbox, imagebox, videobox] + btn_list
         ).then(
             http_bot,
             [state, model_selector, temperature, top_p, max_output_tokens, matryoshka_vis_token_scale],

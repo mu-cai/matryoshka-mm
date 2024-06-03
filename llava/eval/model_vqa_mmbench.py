@@ -118,7 +118,8 @@ def eval_model(args):
                     num_beams=args.num_beams,
                     # no_repeat_ngram_size=3,
                     max_new_tokens=1024,
-                    use_cache=True)
+                    use_cache=True,
+                    matryoshka_vis_token_scale = getattr(args, "matryoshka_vis_token_scale", None))
 
             outputs = tokenizer.batch_decode(output_ids, skip_special_tokens=True)[0].strip()
 
@@ -155,6 +156,7 @@ if __name__ == "__main__":
     parser.add_argument("--all-rounds", action="store_true")
     parser.add_argument("--single-pred-prompt", action="store_true")
     parser.add_argument("--lang", type=str, default="en")
+    parser.add_argument("--matryoshka_vis_token_scale", type=int, default=None)
     args = parser.parse_args()
 
     eval_model(args)

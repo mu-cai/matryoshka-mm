@@ -1,5 +1,6 @@
 #!/bin/bash
-
+matryoshka_vis_token_scale=$1
+CKPT=llava-v1.5-7b-m3-${matryoshka_vis_token_scale}
 gpu_list="${CUDA_VISIBLE_DEVICES:-0}"
 IFS=',' read -ra GPULIST <<< "$gpu_list"
 
@@ -9,7 +10,7 @@ CKPT="llava-v1.5-13b"
 
 for IDX in $(seq 0 $((CHUNKS-1))); do
     CUDA_VISIBLE_DEVICES=${GPULIST[$IDX]} python -m llava.eval.model_vqa_loader \
-        --model-path liuhaotian/llava-v1.5-13b \
+        --model-path mucai/llava-v1.5-7b-m3 \
         --question-file ./playground/data/eval/seed_bench/llava-seed-bench.jsonl \
         --image-folder ./playground/data/eval/seed_bench \
         --answers-file ./playground/data/eval/seed_bench/answers/$CKPT/${CHUNKS}_${IDX}.jsonl \
@@ -35,5 +36,5 @@ done
 python scripts/convert_seed_for_submission.py \
     --annotation-file ./playground/data/eval/seed_bench/SEED-Bench.json \
     --result-file $output_file \
-    --result-upload-file ./playground/data/eval/seed_bench/answers_upload/llava-v1.5-13b.jsonl
+    --result-upload-file ./playground/data/eval/seed_bench/answers_upload/$CKPT.jsonl
 
