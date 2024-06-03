@@ -25,9 +25,9 @@ REPLICATE_WEIGHTS_URL = "https://weights.replicate.delivery/default"
 # files to download from the weights mirrors
 weights = [
     {
-        "dest": "liuhaotian/llava-v1.5-13b",
+        "dest": "mucai/llava-v1.5-7b-m3",
         # git commit hash from huggingface
-        "src": "llava-v1.5-13b/006818fc465ebda4c003c0998674d9141d8d95f8",
+        # "src": "llava-v1.5-13b/006818fc465ebda4c003c0998674d9141d8d95f8",
         "files": [
             "config.json",
             "generation_config.json",
@@ -82,7 +82,7 @@ class Predictor(BasePredictor):
             download_weights(weight["src"], weight["dest"], weight["files"])
         disable_torch_init()
     
-        self.tokenizer, self.model, self.image_processor, self.context_len = load_pretrained_model("liuhaotian/llava-v1.5-13b", model_name="llava-v1.5-13b", model_base=None, load_8bit=False, load_4bit=False)
+        self.tokenizer, self.model, self.image_processor, self.context_len = load_pretrained_model("mucai/llava-v1.5-7b-m3", model_name="llava-v1.5-7b-m3", model_base=None, load_8bit=False, load_4bit=False)
 
     def predict(
         self,
