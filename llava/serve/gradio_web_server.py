@@ -427,8 +427,6 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                         show_label=False,
                         container=False)
                 height = 280
-                # imagebox = gr.Image(type="pil", height = height)
-                # videobox = gr.Video(label="Video", height = height)
                 imagebox = gr.Image(type="pil")
                 videobox = gr.Video(label="Video")
                 
@@ -443,7 +441,6 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                     matryoshka_vis_token_scale = gr.Slider(minimum=1, maximum=5, step=1, value=5, interactive=True,  label="Slider (1: coarsest; 5: finest)")
                 gr.Examples(examples=[
                     [f"{cur_dir}/examples/m3-demo-1.jpg", "Describe this image for me."],
-                    # [f"{cur_dir}/examples/extreme_ironing.jpg", "What is unusual about this image?"],
                     [f"{cur_dir}/examples/waterview.jpg", "What are the things I should be cautious about when I visit here?"],
                 ], inputs=[imagebox, textbox])
                 
@@ -457,37 +454,9 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                             f"{cur_dir}/examples/sample_demo_3.mp4",
                             "Can you identify any safety hazards in this video?"
                         ],
-                        # [
-                        #     f"{cur_dir}/examples/sample_demo_9.mp4",
-                        #     "Describe the video.",
-                        # ],
-                        # [
-                        #     f"{cur_dir}/examples/sample_demo_22.mp4",
-                        #     "Describe the activity in the video.",
-                        # ],
                     ],
                     inputs=[videobox, textbox],
                 )
-                        
-                # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
-                #     matryoshka_vis_token_scale =  gr.Dropdown(choices=[1, 9, 36, 144, 576], value = 9, label="Select a Value")
-                # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
-                #     matryoshka_vis_token_scale_1 = gr.Radio(choices=[1, 9, 36, 144, 576], label="Select a Value")
-                # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
-                #     matryoshka_vis_token_scale_2 = gr.ButtonGroup(choices=[1, 9, 36, 144, 576], label="Select a Value")
-                    
-                # with gr.Accordion("The Number of Visual Tokens", open=True) as parameter_row:
-                #     matryoshka_vis_token_scale_3 = gr.Checklist(choices=[1, 9, 36, 144, 576],label="Select Values")
-                    # matryoshka_vis_token_scale = 
-                    
-
-
-                
-                    # gr.Slider(
-                    #         choices=[576, 144, 36, 9, 1],
-                            # label="Matryoshka Visual Token Scale",
-                            # interactive=True
-                    #     )
                     
                 with gr.Accordion("Parameters", open=False) as parameter_row:
                     temperature = gr.Slider(minimum=0.0, maximum=1.0, value=0.2, step=0.1, interactive=True, label="Temperature",)
@@ -517,9 +486,6 @@ def build_demo(embed_mode, cur_dir=None, concurrency_count=10):
                 gr.Markdown(tos_markdown)
                 gr.Markdown(learn_more_markdown)
 
-        # if not embed_mode:
-        #     gr.Markdown(tos_markdown)
-        #     gr.Markdown(learn_more_markdown)
         url_params = gr.JSON(visible=False)
 
         # Register listeners
