@@ -6,14 +6,14 @@
 
 1. Clone this repository and navigate to LLaVA folder
 ```bash
-git clone https://github.com/haotian-liu/LLaVA.git
+git clone https://github.com/mu-cai/matryoshka-mm.git
 cd LLaVA
 ```
 
 2. Install Package
 ```Shell
-conda create -n llava python=3.10 -y
-conda activate llava
+conda create -n matryoshka-mm python=3.10 -y
+conda activate matryoshka-mm
 python -m pip install --upgrade pip  # enable PEP 660 support
 pip install torch==2.0.1+cu117 torchvision==0.15.2+cu117 torchaudio==2.0.2 --index-url https://download.pytorch.org/whl/cu117
 pip install -e .
@@ -22,6 +22,6 @@ pip uninstall bitsandbytes
 
 ## Run demo
 
-See instructions [here](https://github.com/haotian-liu/LLaVA#demo).
+See instructions [here](https://github.com/mu-cai/matryoshka-mm#demo).
 
 Note that quantization (4-bit, 8-bit) is *NOT* supported on Windows. Stay tuned for the 4-bit support on Windows!

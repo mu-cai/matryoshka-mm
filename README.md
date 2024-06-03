@@ -28,13 +28,15 @@
 
 <!-- <a href="https://llava.hliu.cc/"><img src="assets/demo.gif" width="70%"></a> -->
 
+The fundamental implementation of M3 can be found in this [code snippet](https://github.com/mu-cai/matryoshka-mm/blob/main/llava/model/llava_arch.py#L147).
+
 [![Code License](https://img.shields.io/badge/Code%20License-Apache_2.0-green.svg)](https://github.com/tatsu-lab/stanford_alpaca/blob/main/LICENSE)
 **Usage and License Notices**: This project utilizes certain datasets and checkpoints that are subject to their respective original licenses. Users must comply with all terms and conditions of these original licenses, including but not limited to the [OpenAI Terms of Use](https://openai.com/policies/terms-of-use) for the dataset and the specific licenses for base language models for checkpoints trained using the dataset (e.g. [Llama community license](https://ai.meta.com/llama/license/) for LLaMA-2 and Vicuna-v1.5). This project does not impose any additional constraints beyond those stipulated in the original licenses. Furthermore, users are reminded to ensure that their use of the dataset and checkpoints is in compliance with all applicable laws and regulations.
 
 
 ## Contents
 - [Install](#install)
-- [LLaVA Weights](#llava-weights)
+- [M3 Weights](#m3-weights)
 - [Demo](#Demo)
 - [Model Zoo](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/MODEL_ZOO.md)
 - [Dataset](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/Data.md)
@@ -112,7 +114,7 @@ eval_model(args)
 ```
 </details>
 
-## Matryoshka-mm Weights
+## M3 Weights
 Please check out our [Model Zoo](https://github.com/mu-cai/matryoshka-mm/blob/main/docs/MODEL_ZOO.md) for all public M3 checkpoints, and the instructions of how to use the weights.
 
 ## Demo
@@ -126,10 +128,10 @@ flowchart BT
     %% Declare Nodes
     gws("Gradio (UI Server)")
     c("Controller (API Server):<br/>PORT: 10000")
-    mw7b("Model Worker:<br/>llava-v1.5-7b<br/>PORT: 40000")
-    mw13b("Model Worker:<br/>llava-v1.5-13b<br/>PORT: 40001")
-    sglw13b("SGLang Backend:<br/>llava-v1.6-34b<br/>http://localhost:30000")
-    lsglw13b("SGLang Worker:<br/>llava-v1.6-34b<br/>PORT: 40002")
+    mw7b("Model Worker:<br/>llava-next-vicuna-7b-m3<br/>PORT: 40000")
+    mw13b("Model Worker:<br/>llava-next-vicuna-7b-m3<br/>PORT: 40001")
+    sglw13b("Backend:<br/>llava-v1.5-7b-m3<br/>http://localhost:30000")
+    lsglw13b("Worker:<br/>lllava-v1.5-7b-m3<<br/>PORT: 40002")
 
     %% Declare Styles
     classDef data fill:#3af,stroke:#48a,stroke-width:2px,color:#444

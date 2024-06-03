@@ -6,7 +6,7 @@
 
 1. Clone this repository and navigate to LLaVA folder
 ```bash
-git clone https://github.com/haotian-liu/LLaVA.git
+git clone https://github.com/mu-cai/matryoshka-mm.git
 cd LLaVA
 ```
 
@@ -24,6 +24,6 @@ pip uninstall bitsandbytes
 
 Specify `--device mps` when launching model worker or CLI.
 
-See instructions [here](https://github.com/haotian-liu/LLaVA#demo).
+See instructions [here](https://github.com/mu-cai/matryoshka-mm#demo).
 
 Note that quantization (4-bit, 8-bit) is *NOT* supported on macOS. Stay tuned for the 4-bit support on macOS!

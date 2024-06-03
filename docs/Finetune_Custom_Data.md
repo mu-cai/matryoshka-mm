@@ -1,10 +1,10 @@
-# Finetune LLaVA on Custom Datasets
+# Finetune M3 on Custom Datasets
 
 ## Dataset Format
 
 Convert your data to a JSON file of a List of all samples. Sample metadata should contain `id` (a unique identifier), `image` (the path to the image), and `conversations` (the conversation data between human and AI).
 
-A sample JSON for finetuning LLaVA for generating tag-style captions for Stable Diffusion:
+A sample JSON for finetuning M3 for generating tag-style captions for Stable Diffusion:
 
 ```json
 [
