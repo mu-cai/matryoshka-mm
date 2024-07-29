@@ -290,12 +290,12 @@ For LLaVA-NeXT on video understanding, see [IG-VLM](https://github.com/mu-cai/ma
 
 If you find LLaVA useful for your research and applications, please cite using this BibTeX:
 ```bibtex
-@misc{cai2024matryoshka,
-    author      = {Cai, Mu and Yang, Jianwei and Gao, Jianfeng and Lee, Yong Jae},
-    title       = {Matryoshka Multimodal Models},
-    publisher   = {arXiv:2405.17430},
-    year        = {2024}
-  }
+@article{cai2024matryoshka,
+  title={Matryoshka Multimodal Models},
+  author={Cai, Mu and Yang, Jianwei and Gao, Jianfeng and Lee, Yong Jae},
+  journal={arXiv preprint arXiv:2405.17430},
+  year={2024}
+}
 ```
 
 
