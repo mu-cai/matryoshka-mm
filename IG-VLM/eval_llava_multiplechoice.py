@@ -63,7 +63,8 @@ def infer_and_eval_model(args):
         path_qa,
         path_video,
         dir=path_result_dir,
-        matryoshka_vis_token_scale = args.matryoshka_vis_token_scale
+        matryoshka_vis_token_scale = args.matryoshka_vis_token_scale,
+        args = args,
     )
     llavaPipeline.set_component(
         user_prompt,
@@ -138,6 +139,9 @@ if __name__ == "__main__":
         default=None,
         help="matryoshka_vis_token_scale",
     )
+    parser.add_argument("--num_chunks", type=int, default=1)
+    parser.add_argument("--chunk_idx", type=int, default=0)
+    
 
     args = parser.parse_args()
 

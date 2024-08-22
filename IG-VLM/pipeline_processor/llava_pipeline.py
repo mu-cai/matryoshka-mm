@@ -19,7 +19,21 @@ from model_processor.llava2_model_processor import *
 from vision_processor.fps_gridview_processor import *
 from .record import *
 
+def split_dataframe(df, n):
+    """Split a DataFrame into n (roughly) equal-sized chunks"""
+    chunk_size = math.ceil(len(df) / n)
+    return [df.iloc[i:i+chunk_size] for i in range(0, len(df), chunk_size)]
 
+def get_dataframe_chunk(df, n, k):
+    """Retrieve the k-th chunk from the DataFrame split into n chunks"""
+    chunks = split_dataframe(df, n)
+    if k < len(chunks):
+        return chunks[k]
+    else:
+        raise IndexError("Chunk index out of range")
+    
+    
+    
 class LlavaPipeline:
     def __init__(
         self,
@@ -28,6 +42,7 @@ class LlavaPipeline:
         path_video_file_format,
         dir="./llava_pipeline_result/",
         matryoshka_vis_token_scale= None,
+        args = None,
     ):
         self.model_name = "mucai/" + model_name
         self.path_qa = path_qa
@@ -35,6 +50,8 @@ class LlavaPipeline:
         self.path_result = dir
         self.path_video_file_format = path_video_file_format
         self.error_video_name = []
+        self.num_chunks = getattr(args, 'num_chunks', 1)
+        self.chunk_idx = getattr(args, 'chunk_idx', 0)
         self.make_video_file_list()
         self.load_model(matryoshka_vis_token_scale=matryoshka_vis_token_scale)
 
@@ -83,6 +100,8 @@ class LlavaPipeline:
             video_extensions = ["avi", "mp4", "mkv", "webm", "gif"]
 
             if not os.path.exists(video_path):
+                if os.path.exists(video_path.replace('/v_', '/')):
+                    video_path = video_path.replace('/v_', '/')
                 base_video_path, _ = os.path.splitext(video_path)
                 for ext in video_extensions:
                     temp_path = f"{base_video_path}.{ext}"
@@ -120,6 +139,9 @@ class LlavaPipeline:
     def _load_qa_file(self):
         try:
             self.df_qa = pd.read_csv(self.path_qa, index_col=0)
+            if self.num_chunks != 1:
+                self.df_qa = get_dataframe_chunk(self.df_qa, self.num_chunks, self.chunk_idx)
+                print(f'Initialze Chunk {self.chunk_idx}')
         except Exception as e:
             print(e)
             raise Exception("not valid qa files")
@@ -148,6 +170,8 @@ class LlavaPipeline:
                     except Exception as e:
                         print(file_path)
                         raise (e)
+                else:
+                    print(f'path not found for {file_path}')
 
             self.df_qa.to_csv(path_merged)
         else:

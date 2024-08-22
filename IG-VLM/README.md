@@ -7,6 +7,8 @@ For examples, use this command evaluate `llava-next-vicuna-7b-m3` when each imag
 matryoshka_vis_token_scale=1
 python eval_llava_multiplechoice.py --path_qa_pair_csv ./data/multiple_choice_qa/TVQA.csv --path_video /data/TVQA/videos/%s.mp4 --path_result ./result_tvqa-$matryoshka_vis_token_scale/ --llm_size 7b --matryoshka_vis_token_scale=$matryoshka_vis_token_scale
 ```
+
+If you want to run evaluation on multiple GPUs, have a reference on `IG-VLM/scripts/nextqa_multi.sh`.
 ***
 
 <h2 align="center"> <a>IG-VLM: An Image Grid Can Be Worth a Video: Zero-shot Video Question Answering Using a VLM</a></h2>
