@@ -10,6 +10,7 @@ python -m llava.eval.model_vqa_mmbench \
     --lang cn \
     --single-pred-prompt \
     --temperature 0 \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --conv-mode vicuna_v1
 
 mkdir -p playground/data/eval/mmbench/answers_upload/$SPLIT

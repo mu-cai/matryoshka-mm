@@ -7,6 +7,7 @@ python -m llava.eval.model_vqa \
     --image-folder ./playground/data/eval/mm-vet/images \
     --answers-file ./playground/data/eval/mm-vet/answers/$CKPT.jsonl \
     --temperature 0 \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --conv-mode vicuna_v1
 
 mkdir -p ./playground/data/eval/mm-vet/results

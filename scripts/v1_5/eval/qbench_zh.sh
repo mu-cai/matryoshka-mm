@@ -17,5 +17,6 @@ python -m llava.eval.model_vqa_qbench \
     --image-folder ./playground/data/eval/qbench/images_llvisionqa/ \
     --questions-file ./playground/data/eval/qbench/质衡-问答-$ZH_SPLIT.json \
     --answers-file ./playground/data/eval/qbench/llvisionqa_zh_$1_answers.jsonl \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --conv-mode llava_v1 \
     --lang zh

@@ -7,6 +7,7 @@ python -m llava.eval.model_vqa_loader \
     --image-folder ./playground/data/eval/textvqa/train_images \
     --answers-file ./playground/data/eval/textvqa/answers/${CKPT}.jsonl \
     --temperature 0 \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --conv-mode vicuna_v1
 
 python -m llava.eval.eval_textvqa \

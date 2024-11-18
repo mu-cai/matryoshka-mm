@@ -18,6 +18,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
         --temperature 0 \
+        --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
         --conv-mode vicuna_v1 &
 done
 

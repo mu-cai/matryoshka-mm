@@ -6,6 +6,7 @@ python -m llava.eval.model_vqa_loader \
     --question-file ./playground/data/eval/pope/llava_pope_test.jsonl \
     --image-folder ./playground/data/eval/pope/val2014 \
     --answers-file ./playground/data/eval/pope/answers/$CKPT.jsonl \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --temperature 0 \
     --conv-mode vicuna_v1
 

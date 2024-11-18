@@ -16,6 +16,7 @@ for IDX in $(seq 0 $((CHUNKS-1))); do
         --answers-file ./playground/data/eval/seed_bench/answers/$CKPT/${CHUNKS}_${IDX}.jsonl \
         --num-chunks $CHUNKS \
         --chunk-idx $IDX \
+        --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
         --temperature 0 \
         --conv-mode vicuna_v1 &
 done

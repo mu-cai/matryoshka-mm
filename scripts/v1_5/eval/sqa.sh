@@ -8,6 +8,7 @@ python -m llava.eval.model_vqa_science \
     --answers-file ./playground/data/eval/scienceqa/answers/$CKPT.jsonl \
     --single-pred-prompt \
     --temperature 0 \
+    --matryoshka_vis_token_scale $matryoshka_vis_token_scale \
     --conv-mode vicuna_v1
 
 python llava/eval/eval_science_qa.py \
