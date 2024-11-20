@@ -1,6 +1,14 @@
 
 # Matryoshka Multimodal Models -- lmms-eval
 
+First, install the package:
+
+```
+cd lmms-eval
+pip install -e .
+cd ..
+```
+
 Simply add the arugment `--matryoshka_vis_token_scale=$matryoshka_vis_token_scale` to the original command
 
 For examples, use this command evaluate `llava-next-vicuna-7b-m3` when each image grid owns one visual token:
