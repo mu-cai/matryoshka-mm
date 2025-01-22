@@ -4,6 +4,8 @@
 <br>
 [Mu Cai](https://pages.cs.wisc.edu/~mucai/), [Jianwei Yang](https://jwyang.github.io/), [Jianfeng Gao](https://www.microsoft.com/en-us/research/people/jfgao/?from=http%3A%2F%2Fresearch.microsoft.com%2Fen-us%2Fum%2Fpeople%2Fjfgao%2F) , [Yong Jae Lee](https://pages.cs.wisc.edu/~yongjaelee/)
 
+**Proceedings of the International Conference on Learning Representations (ICLR), 2025**
+
 
 [[Paper](https://arxiv.org/abs/2405.17430)] [[Project Page](https://matryoshka-mm.github.io/)] [[Demo](https://pages.cs.wisc.edu/~mucai/matryoshka-mm.html)]  [[Model Zoo](https://github.com/mu-cai/matryoshka-mmb/lob/main/docs/MODEL_ZOO.md)]
 
@@ -293,8 +295,8 @@ If you find LLaVA useful for your research and applications, please cite using t
 @article{cai2024matryoshka,
   title={Matryoshka Multimodal Models},
   author={Cai, Mu and Yang, Jianwei and Gao, Jianfeng and Lee, Yong Jae},
-  journal={arXiv preprint arXiv:2405.17430},
-  year={2024}
+  journal={Proceedings of the International Conference on Learning Representation},
+  year={2025}
 }
 ```
 
